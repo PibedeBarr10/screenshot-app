@@ -44,7 +44,8 @@ python -m pip install -r requirements.txt
 ```sh
 git clone https://github.com/PibedeBarr10/screenshot-app.git
 ```
-2. Open the app:
+2. Install [prerequisites](#prerequisites)
+3. Open the app:
 ```sh
 python app.pyw
 ```
