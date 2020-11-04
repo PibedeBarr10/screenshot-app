@@ -1,10 +1,12 @@
 import os
+import win32clipboard as cb
 from sys import argv, exit
 from datetime import datetime
 from PIL import Image, ImageGrab
 from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QAction, QLabel, QSizePolicy
 from PyQt5.QtGui import QPainter, QBrush, QColor
 from PyQt5.QtCore import QPoint, Qt, QRect
+from io import BytesIO
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -167,7 +169,13 @@ class Window(QMainWindow):
             self.x2, self.y2 = self.allScreens.width(), self.allScreens.height()
             self.setWindowOpacity(0)
             self.main()
-    
+            
+    def send_to_clipboard(self, clip_type, data):
+        cb.OpenClipboard()
+        cb.EmptyClipboard()
+        cb.SetClipboardData(clip_type, data)
+        cb.CloseClipboard()
+        
     def main(self):
         if not self.pressedRight:
             self.x1, self.y1 = self.begin.x(), self.begin.y()
@@ -189,6 +197,13 @@ class Window(QMainWindow):
             self.screenshot = self.screenshot.crop(area)
             self.screenshot.save(filepath, 'PNG')
             self.screenshot.show()
+
+            output = BytesIO()
+            image = self.screenshot.convert("RGB").save(output, "BMP")
+            data = output.getvalue()[14:]
+            output.close()
+
+            self.send_to_clipboard(cb.CF_DIB, data)
         except SystemError as identifier:
             print("Cannot save image - wrong numbers")
         self.closeAndReturn()
